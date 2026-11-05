@@ -1,0 +1,20 @@
+Game Display for InkyPi
+Copyright (C) 2026 JuiceSpin
+
+This plugin is licensed under the GNU General Public License, version 3 only
+(SPDX: GPL-3.0-only). See LICENSE for the complete terms.
+
+InkyPi is a separate project maintained by fatihak and its contributors:
+https://github.com/fatihak/InkyPi
+
+Gaming Status and Gaming Status Agent are separate projects maintained by
+adamjthompson and their contributors:
+https://github.com/adamjthompson/Gaming-Status
+https://github.com/adamjthompson/Gaming-Status-Agent
+
+Those projects are not bundled in this release. Their names are used to identify
+compatibility; this plugin is not an official release of those projects.
+
+The controller icon was created for this plugin and is included under the same
+licence. Game artwork is obtained from the user's Home Assistant installation
+and is not included in the release. Artwork rights remain with their owners.

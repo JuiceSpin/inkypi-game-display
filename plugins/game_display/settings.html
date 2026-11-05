@@ -1,0 +1,189 @@
+<!-- SPDX-License-Identifier: GPL-3.0-only; Copyright (C) 2026 JuiceSpin -->
+<style>
+#settingsForm > .buttons-container { display: none; }
+.gd-controls { --gd-cell:#edf0f5; --gd-ink:#263246; --gd-muted:#667085; --gd-line:#dce2ea; --gd-accent:#7160ed; color:var(--gd-ink); }
+[data-theme="dark"] .gd-controls { --gd-cell:#28303d; --gd-ink:#f0f2f7; --gd-muted:#aab4c5; --gd-line:#424b59; }
+.gd-controls fieldset { border:0; padding:0; margin:0; min-width:0; }
+.gd-switch-row { display:flex; align-items:center; justify-content:space-between; gap:20px; padding:14px 0; border-bottom:1px solid var(--gd-line); }
+.gd-switch-row strong { display:block; font-size:15px; }
+.gd-controls p { color:var(--gd-muted); font-size:13px; line-height:1.5; margin:5px 0; }
+.gd-switch { position:relative; display:inline-flex; flex-shrink:0; width:44px; height:26px; }
+.gd-switch input { opacity:0; position:absolute; width:100%; height:100%; margin:0; cursor:pointer; }
+.gd-track { width:44px; height:26px; background:#a1a9b5; border-radius:20px; pointer-events:none; transition:background .15s; }
+.gd-track::after { content:""; position:absolute; top:3px; left:3px; width:20px; height:20px; background:white; border-radius:50%; transition:transform .15s; }
+.gd-switch input:checked + .gd-track { background:var(--gd-accent); }
+.gd-switch input:checked + .gd-track::after { transform:translateX(18px); }
+.gd-switch input:focus-visible + .gd-track { outline:3px solid #a69aff; outline-offset:3px; }
+.gd-toolbar { display:flex; justify-content:space-between; align-items:center; gap:10px; margin:18px 0 10px; flex-wrap:wrap; }
+.gd-tools { display:flex; gap:6px; }
+.gd-controls .gd-small { border:1px solid var(--gd-line); background:transparent; color:var(--gd-ink); border-radius:6px; padding:6px 9px; font-size:12px; cursor:pointer; }
+.gd-scroll { overflow-x:auto; padding:4px 2px 8px; }
+.gd-grid { display:grid; grid-template-columns:38px repeat(24,minmax(17px,1fr)); gap:3px; min-width:548px; user-select:none; touch-action:none; }
+.gd-hour { text-align:center; font-size:10px; color:var(--gd-muted); padding:0 0 6px; align-self:end; }
+.gd-day { font-size:12px; align-self:center; font-weight:600; }
+.gd-grid .gd-cell { width:100%; height:25px; min-height:0; padding:0; margin:0; background:var(--gd-cell); border:0; border-radius:3px; cursor:pointer; }
+.gd-grid .gd-cell[aria-pressed="true"] { background:var(--gd-accent); }
+.gd-cell:focus-visible { outline:2px solid var(--gd-ink); outline-offset:1px; z-index:1; }
+.gd-grid.gd-inactive { opacity:.45; }
+.gd-footer { display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; font-size:12px; color:var(--gd-muted); margin:5px 0 18px; }
+.gd-dot { display:inline-block; width:9px; height:9px; border-radius:2px; margin-right:4px; background:var(--gd-accent); }
+.gd-dot.off { background:var(--gd-cell); margin-left:12px; border:1px solid var(--gd-line); }
+.gd-bottom { display:flex; gap:12px; align-items:center; margin-top:15px; }
+.gd-save { padding:10px 16px; background:var(--gd-accent); color:white; border:0; border-radius:7px; cursor:pointer; font-weight:600; }
+.gd-options { margin-top:24px; border:1px solid var(--gd-line); border-radius:8px; padding:14px; }
+.gd-options summary { cursor:pointer; font-weight:600; }
+.gd-option-group { margin:18px 0; }
+.gd-option-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin-top:12px; }
+.gd-option-field { display:flex; flex-direction:column; gap:5px; font-size:13px; min-width:0; }
+.gd-option-field input:not([type="checkbox"]), .gd-option-field select { width:100%; box-sizing:border-box; padding:8px; border:1px solid var(--gd-line); border-radius:5px; background:var(--gd-cell); color:var(--gd-ink); min-width:0; }
+.gd-option-field input[type="checkbox"] { width:18px; height:18px; }
+.gd-keys { margin:12px 0; padding:12px; border-radius:6px; background:var(--gd-cell); font-size:13px; }
+.gd-keys a { color:var(--gd-accent); }
+@media(max-width:600px) { .gd-option-grid { grid-template-columns:1fr; } }
+.gd-controls button:disabled { cursor:default; opacity:.5; }
+#gd-status { font-size:13px; color:var(--gd-muted); }
+#gd-status[data-error="true"] { color:#db5252; }
+</style>
+<section class="gd-controls" aria-label="Game interruption settings">
+  <fieldset id="gd-fields" disabled>
+    <div class="gd-switch-row">
+      <div><strong>Allow game interruptions</strong><p>Show game artwork while you play. Switching off returns to your normal playlist.</p></div>
+      <label class="gd-switch"><input id="gd-enabled" type="checkbox" role="switch" aria-label="Allow game interruptions"><span class="gd-track"></span></label>
+    </div>
+    <div class="gd-switch-row">
+      <div><strong>Use weekly schedule</strong><p>Only interrupt during the selected hours. When off, interruptions are allowed at any time.</p></div>
+      <label class="gd-switch"><input id="gd-scheduled" type="checkbox" role="switch" aria-label="Use weekly schedule"><span class="gd-track"></span></label>
+    </div>
+    <div class="gd-toolbar"><strong>Allowed hours</strong><div class="gd-tools"><button class="gd-small" type="button" id="gd-all">Allow all</button><button class="gd-small" type="button" id="gd-clear">Clear all</button></div></div>
+    <p>Click or drag to select. Each cell is one hour. Times use <strong id="gd-timezone">the display’s timezone</strong>.</p>
+    <div class="gd-scroll"><div id="gd-grid" class="gd-grid" aria-label="Weekly hours, Monday to Sunday"></div></div>
+    <div class="gd-footer"><span><i class="gd-dot"></i>Allowed<i class="gd-dot off"></i>Not allowed</span><span id="gd-count"></span></div>
+    <p id="gd-summary"></p>
+    <div class="gd-bottom"><button id="gd-save" class="gd-save" type="button">Save schedule</button></div>
+  </fieldset>
+  <details id="gd-options" class="gd-options">
+    <summary>Connection &amp; artwork settings</summary>
+    <div class="gd-keys">Home Assistant access token: <strong id="gd-key-status">Checking…</strong>.
+      Manage <code>HOME_ASSISTANT_TOKEN</code> in <a href="/api-keys">InkyPi API Keys</a>.
+      The token is never stored in the plugin settings.</div>
+    <p>Set the Home Assistant base URL and your Gaming Status master sensor. Leave unused Xbox and raw-source fields blank. Display size, orientation and timezone follow InkyPi.</p>
+    <fieldset id="gd-option-fields" disabled><div id="gd-option-groups"></div>
+      <div class="gd-bottom"><button type="button" class="gd-save" id="gd-options-save">Save settings</button><button type="button" class="gd-small" id="gd-test">Test saved connection</button></div>
+    </fieldset>
+    <p id="gd-options-status" role="status" aria-live="polite">Loading settings…</p>
+    <ul id="gd-test-results"></ul>
+  </details>
+  <p id="gd-status" role="status" aria-live="polite">Loading settings…</p>
+</section>
+<script>
+(() => {
+  const root = document.querySelector('.gd-controls');
+  const grid = root.querySelector('#gd-grid');
+  const fields = root.querySelector('#gd-fields');
+  const enabled = root.querySelector('#gd-enabled');
+  const scheduled = root.querySelector('#gd-scheduled');
+  const status = root.querySelector('#gd-status');
+  const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const endpoint = {{ url_for('game_display.controls') | tojson }};
+  const optionsEndpoint = {{ url_for('game_display.settings') | tojson }};
+  const testEndpoint = {{ url_for('game_display.test_connection') | tojson }};
+  const cells = [];
+  let hours, painting = false, paintValue, visited = new Set();
+  function message(text, error=false) { status.textContent=text; status.dataset.error=String(error); }
+  function update() {
+    let count=0;
+    cells.forEach(cell => {const selected=hours[+cell.dataset.day][+cell.dataset.hour];cell.setAttribute('aria-pressed',String(selected));if(selected) count++;});
+    root.querySelector('#gd-count').textContent=`${count} hours / week`;
+    grid.classList.toggle('gd-inactive', !enabled.checked || !scheduled.checked);
+    root.querySelector('#gd-summary').textContent = !enabled.checked ? 'Interruptions are switched off.' : scheduled.checked ? 'Game artwork is allowed only in the selected hours.' : 'Interruptions are allowed all week. Your selected hours are saved for later.';
+  }
+  function dirty() { update(); message('Unsaved changes'); }
+  function paint(cell) {
+    if(!cell || fields.disabled || visited.has(cell)) return;
+    visited.add(cell); hours[+cell.dataset.day][+cell.dataset.hour]=paintValue;dirty();
+  }
+  grid.append(document.createElement('span'));
+  for(let hour=0;hour<24;hour++) {const label=document.createElement('span');label.className='gd-hour';label.textContent=String(hour).padStart(2,'0');grid.append(label);}
+  days.forEach((day,d) => {
+    const label=document.createElement('span');label.className='gd-day';label.textContent=day;grid.append(label);
+    for(let h=0;h<24;h++) {
+      const cell=document.createElement('button');cell.type='button';cell.className='gd-cell';cell.dataset.day=d;cell.dataset.hour=h;
+      cell.setAttribute('aria-label',`${day} ${String(h).padStart(2,'0')}:00–${String(h+1).padStart(2,'0')}:00`);cell.title=cell.getAttribute('aria-label');
+      cell.addEventListener('pointerdown', e => {if(e.button!==0 || fields.disabled || !hours) return;e.preventDefault();cell.focus({preventScroll:true});painting=true;visited=new Set();paintValue=!hours[d][h];paint(cell);grid.setPointerCapture(e.pointerId);});
+      cell.addEventListener('click', e => {if(e.detail===0 && hours) {hours[d][h]=!hours[d][h];dirty();}});
+      cell.addEventListener('keydown', e => {const offsets={ArrowLeft:-1,ArrowRight:1,ArrowUp:-24,ArrowDown:24};if(e.key in offsets){e.preventDefault();cells[Math.max(0,Math.min(167,d*24+h+offsets[e.key]))].focus();}});
+      cells.push(cell);grid.append(cell);
+    }
+  });
+  grid.addEventListener('pointermove', e => {if(painting) {const hit=document.elementFromPoint(e.clientX,e.clientY);paint(hit?.closest('.gd-cell'));}});
+  function stopPainting() {painting=false;visited.clear();}
+  grid.addEventListener('pointerup',stopPainting);grid.addEventListener('pointercancel',stopPainting);grid.addEventListener('lostpointercapture',stopPainting);
+  root.querySelector('#gd-all').addEventListener('click',()=>{hours=days.map(()=>Array(24).fill(true));dirty();});
+  root.querySelector('#gd-clear').addEventListener('click',()=>{hours=days.map(()=>Array(24).fill(false));dirty();});
+  async function save() {
+    fields.disabled=true;message('Saving…');
+    try {
+      const response=await fetch(endpoint,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({enabled:enabled.checked,schedule_enabled:scheduled.checked,hours})});
+      const data=await response.json();if(!response.ok) throw new Error(data.error || 'Could not save settings');
+      update();message('Saved. Changes apply on the next display check.');
+    } catch(error) {message(`${error.message}. Changes have not been saved.`,true);}
+    finally {fields.disabled=false;}
+  }
+  enabled.addEventListener('change',()=>{update();save();});
+  scheduled.addEventListener('change',()=>{update();save();});
+  root.querySelector('#gd-save').addEventListener('click',save);
+  fetch(endpoint).then(async response=>{const data=await response.json();if(!response.ok) throw new Error(data.error || 'Could not load settings');return data;}).then(data=>{
+    hours=data.controls.hours;enabled.checked=data.controls.enabled;scheduled.checked=data.controls.schedule_enabled;
+    root.querySelector('#gd-timezone').textContent=data.timezone;fields.disabled=false;update();message('Switches save immediately. Save the schedule after editing hours.');
+  }).catch(error=>message(error.message+'. Refresh to try again.',true));
+
+  const optionFields=root.querySelector('#gd-option-fields');
+  const optionStatus=root.querySelector('#gd-options-status');
+  const groupNames={connection:'Home Assistant',entities:'Optional platform sensors',timing:'Timing',artwork:'Artwork & return behaviour',layout:'Layout',attributes:'Advanced: master sensor attributes'};
+  const inputs=new Map();let schema=[];
+  function keyStatus(data) {root.querySelector('#gd-key-status').textContent=data.token_configured?'Configured':'Not configured';}
+  async function readOptions() {
+    const response=await fetch(optionsEndpoint);const data=await response.json();if(!response.ok)throw new Error(data.error||'Could not load settings');
+    schema=data.fields;keyStatus(data);
+    const groups=root.querySelector('#gd-option-groups');groups.replaceChildren();
+    Object.entries(groupNames).forEach(([group,label])=>{
+      const section=document.createElement('details');section.className='gd-option-group';section.open=group==='connection';
+      const heading=document.createElement('summary');heading.textContent=label;section.append(heading);
+      const fields=document.createElement('div');fields.className='gd-option-grid';section.append(fields);groups.append(section);
+      schema.filter(field=>field.group===group).forEach(field=>{
+        const wrapper=document.createElement('label');wrapper.className='gd-option-field';
+        const name=document.createElement('span');name.textContent=field.label;wrapper.append(name);
+        const input=document.createElement(field.kind==='select'?'select':'input');input.id='gd-option-'+field.key;
+        if(field.kind==='select') field.limits.forEach(([value,label])=>{const option=document.createElement('option');option.value=value;option.textContent=label;input.append(option);});
+        else input.type=['checkbox','number','color','url'].includes(field.kind)?field.kind:'text';
+        if(field.kind==='checkbox')input.checked=data.settings[field.key];else input.value=data.settings[field.key];
+        if(field.kind==='number'){input.min=field.limits[0];input.max=field.limits[1];input.step='1';}
+        if(field.kind==='entity')input.placeholder=field.limits+'.your_entity';
+        if(field.key==='ha_url')input.placeholder='http://homeassistant.local:8123';
+        input.addEventListener('input',()=>{optionStatus.textContent='Unsaved settings';});
+        inputs.set(field.key,input);wrapper.append(input);fields.append(wrapper);
+      });
+    });
+    root.querySelector('#gd-options').open=!data.settings.ha_url||!data.settings.master_entity||!data.token_configured;
+    optionFields.disabled=false;optionStatus.textContent='Settings apply without restarting InkyPi.';
+  }
+  root.querySelector('#gd-options-save').addEventListener('click',async()=>{
+    const settings={};
+    for(const field of schema){const input=inputs.get(field.key);if(!input.reportValidity())return;settings[field.key]=field.kind==='checkbox'?input.checked:field.kind==='number'?Number(input.value):input.value;}
+    optionFields.disabled=true;optionStatus.textContent='Saving…';
+    try{const response=await fetch(optionsEndpoint,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(settings)});const data=await response.json();if(!response.ok)throw new Error(data.error||'Save failed');keyStatus(data);optionStatus.textContent='Settings saved.';}
+    catch(error){optionStatus.textContent=error.message+'. Changes have not been saved.';}
+    finally{optionFields.disabled=false;}
+  });
+  root.querySelector('#gd-test').addEventListener('click',async()=>{
+    optionFields.disabled=true;optionStatus.textContent='Testing saved settings…';root.querySelector('#gd-test-results').replaceChildren();
+    try{const response=await fetch(testEndpoint,{method:'POST'});const data=await response.json();if(!response.ok)throw new Error(data.error||'Connection test failed');
+      data.results.forEach(result=>{const li=document.createElement('li');li.textContent=result.entity+': '+result.status;root.querySelector('#gd-test-results').append(li);});
+      optionStatus.textContent=data.success?'Connected. Configured entities are responding.':'Connected. Some entities are missing or unavailable; check the results.';
+    }catch(error){optionStatus.textContent=error.message;}
+    finally{optionFields.disabled=false;}
+  });
+  readOptions().catch(error=>{optionStatus.textContent=error.message+'. Refresh to try again.';});
+  window.addEventListener('focus',()=>{fetch(optionsEndpoint).then(r=>r.json()).then(keyStatus).catch(()=>{});});
+})();
+</script>

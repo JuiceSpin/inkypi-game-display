@@ -1,0 +1,5 @@
+# Tests only. Runtime uses the existing InkyPi environment.
+Flask>=2.3,<4
+Pillow>=10,<13
+requests>=2.31,<3
+python-dotenv>=1,<2

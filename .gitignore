@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.env
+ha-token
+config/
+dist/
+.venv/
